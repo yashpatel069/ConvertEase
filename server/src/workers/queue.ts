@@ -34,9 +34,6 @@ class ProcessingQueue {
     setInterval(() => this.processNext(), 1000);
   }
 
-  /**
-   * Add a job to the background processing queue
-   */
   public addJob(job: Job): void {
     this.queue.push(job);
     console.log(`[Queue] Added job ${job.id} - Type: ${job.type}`);
@@ -45,6 +42,8 @@ class ProcessingQueue {
       status: 'pending',
       message: 'Job added to conversion queue.'
     });
+    // Start processing immediately instead of waiting for the interval tick
+    this.processNext();
   }
 
   private async processNext(): Promise<void> {
