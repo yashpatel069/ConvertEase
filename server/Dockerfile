@@ -14,7 +14,7 @@ COPY server/tsconfig.json ./
 COPY server/src/ ./src/
 
 # Development compiler to perform TS-build
-RUN npm install -g typescript && tsc
+RUN npm install -g typescript@5.4.5 && tsc
 
 # Set production env
 ENV NODE_ENV=production
