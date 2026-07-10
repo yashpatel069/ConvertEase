@@ -4,9 +4,15 @@ import { Server, Socket } from 'socket.io';
 let io: Server | null = null;
 
 export const initSocket = (server: HttpServer, clientUrl: string): Server => {
+  const allowedOrigins = [
+    clientUrl,
+    clientUrl.replace(/\/$/, ''),
+    'http://localhost:5173'
+  ];
+
   io = new Server(server, {
     cors: {
-      origin: clientUrl || '*',
+      origin: allowedOrigins,
       methods: ['GET', 'POST'],
       credentials: true
     }

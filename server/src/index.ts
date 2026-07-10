@@ -1,4 +1,7 @@
 import express from 'express';
+import dns from 'dns';
+dns.setDefaultResultOrder('ipv4first');
+
 import http from 'http';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -40,9 +43,24 @@ app.use(
 );
 
 // CORS configuration
+const allowedOrigins = [
+  clientUrl,
+  clientUrl.replace(/\/$/, ''),
+  'http://localhost:5173'
+];
+
 app.use(
   cors({
-    origin: clientUrl,
+    origin: (origin, callback) => {
+      if (!origin) return callback(null, true);
+      const sanitized = origin.replace(/\/$/, '');
+      const match = allowedOrigins.some(o => o.replace(/\/$/, '') === sanitized);
+      if (match) {
+        callback(null, true);
+      } else {
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Cookie'],
