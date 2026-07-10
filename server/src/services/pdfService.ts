@@ -9,6 +9,23 @@ import { promisify } from 'util';
 const execPromise = promisify(exec);
 
 export class PDFService {
+  private static sanitizePdfText(text: string): string {
+    if (!text) return '';
+    const cleanTabs = text.replace(/\t/g, '    ');
+    return cleanTabs
+      .split('')
+      .filter((char) => {
+        const code = char.charCodeAt(0);
+        return (
+          (code >= 32 && code <= 126) ||
+          (code >= 160 && code <= 255) ||
+          code === 10 ||
+          code === 13
+        );
+      })
+      .join('');
+  }
+
   /**
    * Merge multiple PDF files into a single output PDF
    */
@@ -162,7 +179,8 @@ export class PDFService {
 
       if (options.type === 'text' && options.textValue) {
         // Draw text overlay
-        page.drawText(options.textValue, {
+        const cleanText = PDFService.sanitizePdfText(options.textValue);
+        page.drawText(cleanText, {
           x: width / 4,
           y: height / 2,
           size: 50 * scale,
@@ -289,6 +307,7 @@ export class PDFService {
     // Pure JS Fallback: DOCX -> HTML/Text -> PDF-Lib drawing
     const result = await mammoth.convertToHtml({ path: inputPath });
     const text = result.value.replace(/<[^>]*>/g, '\n'); // Simple HTML strip to text
+    const sanitizedText = PDFService.sanitizePdfText(text);
 
     const pdfDoc = await PDFDocument.create();
     const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
@@ -299,7 +318,7 @@ export class PDFService {
     let { width, height } = page.getSize();
     let y = height - margin;
 
-    const lines = text.split('\n');
+    const lines = sanitizedText.split('\n');
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed) {

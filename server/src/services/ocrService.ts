@@ -3,6 +3,23 @@ import fs from 'fs';
 import { PDFDocument, StandardFonts } from 'pdf-lib';
 
 export class OCRService {
+  private static sanitizePdfText(text: string): string {
+    if (!text) return '';
+    const cleanTabs = text.replace(/\t/g, '    ');
+    return cleanTabs
+      .split('')
+      .filter((char) => {
+        const code = char.charCodeAt(0);
+        return (
+          (code >= 32 && code <= 126) ||
+          (code >= 160 && code <= 255) ||
+          code === 10 ||
+          code === 13
+        );
+      })
+      .join('');
+  }
+
   /**
    * Run OCR on an image and return raw text
    */
@@ -36,7 +53,8 @@ export class OCRService {
     let { width, height } = page.getSize();
     let y = height - margin;
 
-    const lines = text.split('\n');
+    const sanitizedText = OCRService.sanitizePdfText(text);
+    const lines = sanitizedText.split('\n');
     for (const line of lines) {
       const trimmed = line.trim();
       if (!trimmed) {
