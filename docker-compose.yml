@@ -13,8 +13,8 @@ services:
 
   server:
     build:
-      context: ./server
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: server/Dockerfile
     container_name: convertease-server
     ports:
       - "5000:5000"
