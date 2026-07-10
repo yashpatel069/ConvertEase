@@ -7,7 +7,8 @@ WORKDIR /app
 
 COPY server/package*.json ./
 
-RUN npm ci --only=production && npm cache clean --force
+# Install ALL dependencies (including types for tsc compile)
+RUN npm ci
 
 # Copy source code and config
 COPY server/tsconfig.json ./
@@ -15,6 +16,9 @@ COPY server/src/ ./src/
 
 # Development compiler to perform TS-build
 RUN npm install -g typescript@5.4.5 && tsc
+
+# Prune devDependencies to keep final image small
+RUN npm prune --production && npm cache clean --force
 
 # Set production env
 ENV NODE_ENV=production
