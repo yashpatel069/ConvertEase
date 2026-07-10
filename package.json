@@ -4,7 +4,7 @@
   "description": "Desktop Application wrapper for ConvertEase AI.",
   "main": "main.js",
   "scripts": {
-    "postinstall": "npm install --prefix client && npm install --prefix server",
+    "postinstall": "npm install --prefix client --legacy-peer-deps && npm install --prefix server",
     "build:client": "npm run build --prefix client",
     "build:server": "npm run build --prefix server",
     "start": "electron .",
