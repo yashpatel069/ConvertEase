@@ -102,6 +102,20 @@ if (!fs.existsSync(tempUploadDir)) {
   fs.mkdirSync(tempUploadDir, { recursive: true });
 }
 
+// Serve React client static assets in production mode
+if (process.env.NODE_ENV === 'production') {
+  const clientBuildPath = path.join(__dirname, '../../client/dist');
+  if (fs.existsSync(clientBuildPath)) {
+    app.use(express.static(clientBuildPath));
+    app.get('*', (req, res, next) => {
+      if (req.path.startsWith('/api') || req.path.startsWith('/stored_files')) {
+        return next();
+      }
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    });
+  }
+}
+
 // 404 Route handling
 app.use((req, res, next) => {
   res.status(404).json({

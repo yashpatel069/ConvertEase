@@ -1,0 +1,34 @@
+{
+  "name": "convertease-desktop",
+  "version": "1.0.0",
+  "description": "Desktop Application wrapper for ConvertEase AI.",
+  "main": "main.js",
+  "scripts": {
+    "postinstall": "npm install --prefix client && npm install --prefix server",
+    "build:client": "npm run build --prefix client",
+    "build:server": "npm run build --prefix server",
+    "start": "electron .",
+    "dist": "npm run build:client && npm run build:server && electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^29.1.0",
+    "electron-builder": "^24.13.3"
+  },
+  "build": {
+    "appId": "com.convertease.app",
+    "productName": "ConvertEase",
+    "directories": {
+      "output": "dist-desktop"
+    },
+    "files": [
+      "main.js",
+      "client/dist/**/*",
+      "server/dist/**/*",
+      "server/package.json",
+      "server/node_modules/**/*"
+    ],
+    "win": {
+      "target": "nsis"
+    }
+  }
+}
